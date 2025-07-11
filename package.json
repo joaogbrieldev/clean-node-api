@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/node": "^24.0.13",
     "git-commit-msg-linter": "^5.0.8",
+    "standard": "^17.1.2",
     "typescript": "^5.8.3"
   }
 }
