@@ -2,10 +2,10 @@
   "name": "clean-node-api",
   "version": "3.0.0",
   "description": "NodeJs Rest API and GraphQL using TDD, Clean Architecture, Typescript and Design Patterns",
-  "author": "Rodrigo Manguinho",
+  "author": "João Gabriel",
   "license": "GPL-3.0-or-later",
-  "repository": "github:rmanguinho/clean-ts-api",
-  "homepage": "https://rmanguinho.github.io",
+  "repository": "github:joaogabriel/clean-ts-api",
+  "homepage": "https://joaogabriel.github.io",
   "scripts": {
     "start": "node dist/main/server.js",
     "debug": "nodemon -L --watch ./dist --inspect=0.0.0.0:9222 --nolazy ./dist/main/server.js",
