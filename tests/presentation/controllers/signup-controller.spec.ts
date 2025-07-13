@@ -22,14 +22,14 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
-    add(account: AddAccountModel): Promise<AccountModel> {
+    add(account: AddAccountModel): AccountModel {
       const fakeAccount = {
         id: "valid_id",
         name: "valid_name",
         email: "valid_email@mail.com",
         password: "valid_password",
       };
-      return Promise.resolve(fakeAccount);
+      return fakeAccount;
     }
   }
   return new AddAccountStub();
@@ -213,6 +213,26 @@ describe("SignUpController", () => {
       name: "any_name",
       email: "any_email@mail.com",
       password: "any_password",
+    });
+  });
+
+  test("Should return 200 on success", () => {
+    const { sut } = makeSut();
+    const httpRequest = {
+      body: {
+        name: "any_name",
+        email: "any_email@mail.com",
+        password: "any_password",
+        passwordConfirmation: "any_password",
+      },
+    };
+    const httpResponse = sut.handle(httpRequest);
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse.body).toEqual({
+      id: "valid_id",
+      name: "valid_name",
+      email: "valid_email@mail.com",
+      password: "valid_password",
     });
   });
 });
