@@ -1,8 +1,8 @@
-import { AddAccountRepository } from "@/data/protocols/add-account-repository";
 import {
   AccountModel,
   AddAccount,
   AddAccountModel,
+  AddAccountRepository,
   Encrypter,
 } from "./db-add-account-protocols";
 
