@@ -1,10 +1,25 @@
 import { DbAddAccount } from "@/data/usecases/add-account/db-add-account";
-import { Encrypter } from "../protocols/encrypter";
+import {
+  AccountModel,
+  AddAccountModel,
+  AddAccountRepository,
+  Encrypter,
+} from "@/data/usecases/add-account/db-add-account-protocols";
 
-interface SutTypes {
-  sut: DbAddAccount;
-  encrypterStub: Encrypter;
-}
+const makeAddAccountRepositoryStub = (): AddAccountRepository => {
+  class AddAccountRepositoryStub implements AddAccountRepository {
+    async add(accountData: AddAccountModel): Promise<AccountModel> {
+      const fakeAccount = {
+        id: "any_id",
+        name: "any_name",
+        email: "any_email@mail.com",
+        password: "hashed_password",
+      };
+      return new Promise((resolve) => resolve(fakeAccount));
+    }
+  }
+  return new AddAccountRepositoryStub();
+};
 
 const makeEncrypterStub = (): Encrypter => {
   class EncrypterStub implements Encrypter {
@@ -15,12 +30,20 @@ const makeEncrypterStub = (): Encrypter => {
   return new EncrypterStub();
 };
 
+interface SutTypes {
+  sut: DbAddAccount;
+  encrypterStub: Encrypter;
+  addAccountRepositoryStub: AddAccountRepository;
+}
+
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypterStub();
-  const sut = new DbAddAccount(encrypterStub);
+  const addAccountRepositoryStub = makeAddAccountRepositoryStub();
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub);
   return {
     sut,
     encrypterStub,
+    addAccountRepositoryStub,
   };
 };
 
@@ -47,5 +70,20 @@ describe("DbAddAccount Usecase", () => {
     };
     const promise = sut.add(accountData);
     await expect(promise).rejects.toThrow();
+  });
+
+  test("Should call AddAccountRepository with correct values", async () => {
+    const { sut, addAccountRepositoryStub } = makeSut();
+    const addAccountRepositorySpy = jest.spyOn(addAccountRepositoryStub, "add");
+    const accountData = {
+      name: "any_name",
+      email: "any_email@mail.com",
+      password: "any_password",
+    };
+    await sut.add(accountData);
+    expect(addAccountRepositorySpy).toHaveBeenCalledWith({
+      ...accountData,
+      password: "hashed_password",
+    });
   });
 });
