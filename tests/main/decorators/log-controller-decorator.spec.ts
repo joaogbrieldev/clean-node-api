@@ -5,11 +5,16 @@ import {
   HttpResponse,
 } from "@/presentation/protocols";
 
+interface SutTypes {
+  sut: LogControllerDecorator;
+  controllerStub: Controller;
+}
+
 describe("LogControllerDecorator", () => {
-  test("should call handle with correct request", async () => {
+  const makeSut = (): SutTypes => {
     class ControllerStub implements Controller {
       async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-        const httpResponse: HttpResponse = {
+        return {
           statusCode: 200,
           body: {
             name: "any_name",
@@ -18,12 +23,19 @@ describe("LogControllerDecorator", () => {
             passwordConfirmation: "any_password",
           },
         };
-        return httpResponse;
       }
     }
     const controllerStub = new ControllerStub();
-    const handleSpy = jest.spyOn(controllerStub, "handle");
     const sut = new LogControllerDecorator(controllerStub);
+    return {
+      sut,
+      controllerStub,
+    };
+  };
+
+  test("should call handle with correct request", async () => {
+    const { sut, controllerStub } = makeSut();
+    const handleSpy = jest.spyOn(controllerStub, "handle");
     const httpRequest = {
       body: {
         name: "any_name",
