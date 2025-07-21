@@ -1,4 +1,6 @@
+import { LogErrorRepository } from "@/data/protocols/log-error-repository";
 import { LogControllerDecorator } from "@/main/decorators/log";
+import { serverError } from "@/presentation/helpers/http-helper";
 import {
   Controller,
   HttpRequest,
@@ -8,6 +10,7 @@ import {
 interface SutTypes {
   sut: LogControllerDecorator;
   controllerStub: Controller;
+  logErrorRepositoryStub: LogErrorRepository;
 }
 
 describe("LogControllerDecorator", () => {
@@ -27,11 +30,25 @@ describe("LogControllerDecorator", () => {
       }
     }
     const controllerStub = new ControllerStub();
-    const sut = new LogControllerDecorator(controllerStub);
+    const logErrorRepositoryStub = makeLogErrorRepository();
+    const sut = new LogControllerDecorator(
+      controllerStub,
+      logErrorRepositoryStub
+    );
     return {
       sut,
       controllerStub,
+      logErrorRepositoryStub,
     };
+  };
+
+  const makeLogErrorRepository = (): LogErrorRepository => {
+    class LogErrorRepositoryStub implements LogErrorRepository {
+      async log(stack: string): Promise<void> {
+        return new Promise((resolve) => resolve());
+      }
+    }
+    return new LogErrorRepositoryStub();
   };
 
   test("should call handle with correct request", async () => {
@@ -69,5 +86,27 @@ describe("LogControllerDecorator", () => {
         },
       })
     );
+  });
+
+  test("should call LogErrorRepository with correct error if status code is 500", async () => {
+    const { sut, controllerStub, logErrorRepositoryStub } = makeSut();
+    const fakeError = new Error();
+    fakeError.stack = "any_stack";
+    const error = serverError(fakeError);
+    const logSpy = jest.spyOn(logErrorRepositoryStub, "log");
+    jest
+      .spyOn(controllerStub, "handle")
+      .mockReturnValueOnce(new Promise((resolve) => resolve(error as any)));
+
+    const httpRequest = {
+      body: {
+        name: "any_name",
+        email: "any_email@mail.com",
+        password: "any_password",
+        passwordConfirmation: "any_password",
+      },
+    };
+    await sut.handle(httpRequest);
+    expect(logErrorRepositoryStub.log).toHaveBeenCalledWith("any_stack");
   });
 });
