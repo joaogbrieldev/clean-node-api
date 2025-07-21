@@ -14,7 +14,7 @@ describe("LogControllerDecorator", () => {
   const makeSut = (): SutTypes => {
     class ControllerStub implements Controller {
       async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-        return {
+        const httpResponse = {
           statusCode: 200,
           body: {
             name: "any_name",
@@ -23,6 +23,7 @@ describe("LogControllerDecorator", () => {
             passwordConfirmation: "any_password",
           },
         };
+        return new Promise((resolve) => resolve(httpResponse));
       }
     }
     const controllerStub = new ControllerStub();
@@ -46,5 +47,27 @@ describe("LogControllerDecorator", () => {
     };
     await sut.handle(httpRequest);
     expect(handleSpy).toHaveBeenCalledWith(httpRequest);
+  });
+
+  test("should return the same result of the controller", async () => {
+    const { sut, controllerStub } = makeSut();
+    const httpResponse = await sut.handle({
+      body: {
+        name: "any_name",
+        email: "any_email@mail.com",
+        password: "any_password",
+        passwordConfirmation: "any_password",
+      },
+    });
+    expect(httpResponse).toEqual(
+      await controllerStub.handle({
+        body: {
+          name: "any_name",
+          email: "any_email@mail.com",
+          password: "any_password",
+          passwordConfirmation: "any_password",
+        },
+      })
+    );
   });
 });
