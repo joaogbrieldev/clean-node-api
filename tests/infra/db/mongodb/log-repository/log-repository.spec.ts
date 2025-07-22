@@ -2,6 +2,10 @@ import { MongoHelper } from "@/infra/db/mongodb/helpers/mongo-helper";
 import { LogMongoRepository } from "@/infra/db/mongodb/log-repository/log";
 import { Collection } from "mongodb";
 
+const makeSut = (): LogMongoRepository => {
+  return new LogMongoRepository();
+};
+
 describe("LogRepository", () => {
   let errorCollection: Collection;
   beforeAll(async () => {
@@ -18,7 +22,7 @@ describe("LogRepository", () => {
   });
 
   test("should create an error log on success", async () => {
-    const sut = new LogMongoRepository();
+    const sut = makeSut();
     const log = {
       timestamp: new Date(),
       level: "info",
