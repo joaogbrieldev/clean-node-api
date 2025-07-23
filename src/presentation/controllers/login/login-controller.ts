@@ -1,4 +1,3 @@
-import { Authentication } from "@/domain/usecases/authentication";
 import { InvalidParamError } from "@/presentation/errors/invalid-param-error";
 import { MissingParamError } from "@/presentation/errors/missing-param-error";
 import {
@@ -7,9 +6,13 @@ import {
   serverError,
   unauthorized,
 } from "@/presentation/helpers/http-helper";
-import { HttpRequest, HttpResponse } from "@/presentation/protocols";
-import { Controller } from "@/presentation/protocols/controller";
-import { EmailValidator } from "@/presentation/protocols/email-validator";
+import {
+  Authentication,
+  Controller,
+  EmailValidator,
+  HttpRequest,
+  HttpResponse,
+} from "./login-protocols";
 
 export class LoginController implements Controller {
   private readonly emailValidator: EmailValidator;

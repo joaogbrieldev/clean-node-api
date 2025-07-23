@@ -1,14 +1,15 @@
-import { Authentication } from "@/domain/usecases/authentication";
 import { LoginController } from "@/presentation/controllers/login/login-controller";
-import { InvalidParamError } from "@/presentation/errors/invalid-param-error";
-import { MissingParamError } from "@/presentation/errors/missing-param-error";
+import {
+  Authentication,
+  EmailValidator,
+  HttpRequest,
+} from "@/presentation/controllers/login/login-protocols";
+import { InvalidParamError, MissingParamError } from "@/presentation/errors";
 import {
   badRequest,
   serverError,
   unauthorized,
 } from "@/presentation/helpers/http-helper";
-import { HttpRequest } from "@/presentation/protocols";
-import { EmailValidator } from "@/presentation/protocols/email-validator";
 
 const makeFakeRequest = (): HttpRequest => {
   return {
