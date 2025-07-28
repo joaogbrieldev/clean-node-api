@@ -7,14 +7,17 @@ interface SutTypes {
   validationStubs: Validation[];
 }
 
-class ValidationStub implements Validation {
-  validate(input: any): Error | null {
-    return new MissingParamError("field");
+const makeValidationStub = (): Validation => {
+  class ValidationStub implements Validation {
+    validate(input: any): Error | null {
+      return null;
+    }
   }
-}
+  return new ValidationStub();
+};
 
 const makeSut = (): SutTypes => {
-  const validationStubs = [new ValidationStub(), new ValidationStub()];
+  const validationStubs = [makeValidationStub(), makeValidationStub()];
   const sut = new ValidationComposite(validationStubs);
   return {
     sut,
@@ -46,7 +49,7 @@ describe("ValidationComposite", () => {
     expect(error).toEqual(new MissingParamError("field"));
   });
   test("should not return if validation succeeds", () => {
-    const { sut, validationStubs } = makeSut();
+    const { sut } = makeSut();
     const error = sut.validate({ field: "any_value" });
     expect(error).toBeFalsy();
   });
