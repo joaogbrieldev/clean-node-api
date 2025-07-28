@@ -10,7 +10,7 @@ import {
   serverError,
   unauthorized,
 } from "@/presentation/helpers/http/http-helper";
-import { Validation } from "@/presentation/helpers/validators/validation";
+import { Validation } from "@/presentation/protocols/validation";
 
 const makeFakeRequest = (): HttpRequest => {
   return {
