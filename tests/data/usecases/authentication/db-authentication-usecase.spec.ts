@@ -1,4 +1,5 @@
 import { HashComparer } from "@/data/protocols/criptography/hash-comparer";
+import { TokenGenerator } from "@/data/protocols/criptography/token-generator";
 import { LoadAccountByEmailRepository } from "@/data/protocols/db/load-account-by-email-repository";
 import { DBAuthentication } from "@/data/usecases/authentication/db-authentication";
 import { AuthenticationModel } from "@/domain/usecases/authentication";
@@ -9,11 +10,18 @@ describe("DBAuthenticationUsecase", () => {
     sut: DBAuthentication;
     hashComparer: HashComparerStub;
     loadAccountByEmailRepository: LoadAccountByEmailRepositorySpy;
+    tokenGenerator: TokenGeneratorStub;
   };
 
   class HashComparerStub implements HashComparer {
     async compare(value: string, hash: string): Promise<boolean> {
       return new Promise((resolve) => resolve(true));
+    }
+  }
+
+  class TokenGeneratorStub implements TokenGenerator {
+    async generate(id: string): Promise<string> {
+      return new Promise((resolve) => resolve("any_token"));
     }
   }
 
@@ -37,14 +45,17 @@ describe("DBAuthenticationUsecase", () => {
   const makeSut = (): SutTypes => {
     const hashComparer = new HashComparerStub();
     const loadAccountByEmailRepository = new LoadAccountByEmailRepositorySpy();
+    const tokenGenerator = new TokenGeneratorStub();
     const sut = new DBAuthentication(
       loadAccountByEmailRepository,
-      hashComparer
+      hashComparer,
+      tokenGenerator
     );
     return {
       sut,
       loadAccountByEmailRepository,
       hashComparer,
+      tokenGenerator,
     };
   };
 
@@ -100,5 +111,11 @@ describe("DBAuthenticationUsecase", () => {
     jest.spyOn(hashComparer, "compare").mockResolvedValueOnce(false);
     const authentication = await sut.auth(makeFakeAuthentication());
     expect(authentication).toBeNull();
+  });
+  test("should call TokenGenerator with correct value", async () => {
+    const { sut, tokenGenerator } = makeSut();
+    const tokenGeneratorSpy = jest.spyOn(tokenGenerator, "generate");
+    await sut.auth(makeFakeAuthentication());
+    expect(tokenGeneratorSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
 });
