@@ -95,4 +95,10 @@ describe("DBAuthenticationUsecase", () => {
     const promise = sut.auth(makeFakeAuthentication());
     await expect(promise).rejects.toThrow();
   });
+  test("should return null if HashComparer returns false", async () => {
+    const { sut, hashComparer } = makeSut();
+    jest.spyOn(hashComparer, "compare").mockResolvedValueOnce(false);
+    const authentication = await sut.auth(makeFakeAuthentication());
+    expect(authentication).toBeNull();
+  });
 });
