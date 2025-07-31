@@ -1,3 +1,4 @@
+import { Hasher } from "@/data/protocols/criptography/hasher";
 import {
   Authentication,
   AuthenticationModel,
@@ -5,7 +6,6 @@ import {
 import {
   HashComparer,
   LoadAccountByEmailRepository,
-  TokenGenerator,
   UpdateAccessTokenRepository,
 } from "./db-authentication-protocols";
 
@@ -13,7 +13,7 @@ export class DBAuthentication implements Authentication {
   constructor(
     private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
     private readonly hashComparer: HashComparer,
-    private readonly tokenGenerator: TokenGenerator,
+    private readonly hasher: Hasher,
     private readonly updateAccessTokenRepository: UpdateAccessTokenRepository
   ) {}
   async auth(authentication: AuthenticationModel): Promise<string> {
@@ -26,7 +26,7 @@ export class DBAuthentication implements Authentication {
         account.password
       );
       if (isValid) {
-        const accessToken = await this.tokenGenerator.generate(account.id);
+        const accessToken = await this.hasher.hash(account.id);
         await this.updateAccessTokenRepository.update(account.id, accessToken);
         return accessToken;
       }
