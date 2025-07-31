@@ -17,11 +17,14 @@ export class DBAuthentication implements Authentication {
       authentication.email
     );
     if (account) {
-      await this.hashComparer.compare(
+      const isValid = await this.hashComparer.compare(
         authentication.password,
         account.password
       );
-      const accessToken = await this.tokenGenerator.generate(account.id);
+      if (isValid) {
+        const accessToken = await this.tokenGenerator.generate(account.id);
+        return accessToken;
+      }
     }
     return null;
   }
