@@ -1,8 +1,8 @@
+import { Hasher } from "@/data/protocols/criptography/hasher";
 import { DBAuthentication } from "@/data/usecases/authentication/db-authentication";
 import {
   HashComparer,
   LoadAccountByEmailRepository,
-  TokenGenerator,
   UpdateAccessTokenRepository,
 } from "@/data/usecases/authentication/db-authentication-protocols";
 import { AuthenticationModel } from "@/domain/usecases/authentication";
@@ -13,7 +13,7 @@ describe("DBAuthenticationUsecase", () => {
     sut: DBAuthentication;
     hashComparer: HashComparerStub;
     loadAccountByEmailRepository: LoadAccountByEmailRepositorySpy;
-    tokenGenerator: TokenGeneratorStub;
+    hasher: HasherStub;
     updateAccessTokenRepository: UpdateAccessTokenRepositorySpy;
   };
 
@@ -29,8 +29,8 @@ describe("DBAuthenticationUsecase", () => {
     }
   }
 
-  class TokenGeneratorStub implements TokenGenerator {
-    async generate(id: string): Promise<string> {
+  class HasherStub implements Hasher {
+    async hash(value: string): Promise<string> {
       return new Promise((resolve) => resolve("any_token"));
     }
   }
@@ -55,19 +55,19 @@ describe("DBAuthenticationUsecase", () => {
   const makeSut = (): SutTypes => {
     const hashComparer = new HashComparerStub();
     const loadAccountByEmailRepository = new LoadAccountByEmailRepositorySpy();
-    const tokenGenerator = new TokenGeneratorStub();
+    const hasher = new HasherStub();
     const updateAccessTokenRepository = new UpdateAccessTokenRepositorySpy();
     const sut = new DBAuthentication(
       loadAccountByEmailRepository,
       hashComparer,
-      tokenGenerator,
+      hasher,
       updateAccessTokenRepository
     );
     return {
       sut,
       loadAccountByEmailRepository,
       hashComparer,
-      tokenGenerator,
+      hasher,
       updateAccessTokenRepository,
     };
   };
@@ -125,23 +125,23 @@ describe("DBAuthenticationUsecase", () => {
     const authentication = await sut.auth(makeFakeAuthentication());
     expect(authentication).toBeNull();
   });
-  test("should call TokenGenerator with correct value", async () => {
-    const { sut, tokenGenerator } = makeSut();
-    const tokenGeneratorSpy = jest.spyOn(tokenGenerator, "generate");
+  test("should call Hasher with correct value", async () => {
+    const { sut, hasher } = makeSut();
+    const hasherSpy = jest.spyOn(hasher, "hash");
     await sut.auth(makeFakeAuthentication());
-    expect(tokenGeneratorSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should return the accessToken on success", async () => {
-    const { sut, tokenGenerator } = makeSut();
-    const generateSpy = jest.spyOn(tokenGenerator, "generate");
+    const { sut, hasher } = makeSut();
+    const hasherSpy = jest.spyOn(hasher, "hash");
     await sut.auth(makeFakeAuthentication());
-    expect(generateSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should return the accessToken on success", async () => {
-    const { sut, tokenGenerator } = makeSut();
-    const generateSpy = jest.spyOn(tokenGenerator, "generate");
+    const { sut, hasher } = makeSut();
+    const hasherSpy = jest.spyOn(hasher, "hash");
     await sut.auth(makeFakeAuthentication());
-    expect(generateSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should call UpdateAccessTokenRepository with correct values", async () => {
     const { sut, updateAccessTokenRepository } = makeSut();
