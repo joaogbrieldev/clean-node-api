@@ -124,4 +124,10 @@ describe("DBAuthenticationUsecase", () => {
     await sut.auth(makeFakeAuthentication());
     expect(generateSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
+  test("should return the accessToken on success", async () => {
+    const { sut, tokenGenerator } = makeSut();
+    const generateSpy = jest.spyOn(tokenGenerator, "generate");
+    await sut.auth(makeFakeAuthentication());
+    expect(generateSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+  });
 });
