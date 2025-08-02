@@ -33,6 +33,9 @@ describe("DBAuthenticationUsecase", () => {
     async hash(value: string): Promise<string> {
       return new Promise((resolve) => resolve("any_token"));
     }
+    async compare(value: string, hash: string): Promise<boolean> {
+      return new Promise((resolve) => resolve(true));
+    }
   }
 
   class LoadAccountByEmailRepositorySpy
