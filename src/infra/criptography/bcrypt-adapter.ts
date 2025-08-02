@@ -8,4 +8,7 @@ export class BcryptAdapter implements Hasher {
   async hash(value: string): Promise<string> {
     return bcrypt.hash(value, this.salt);
   }
+  async compare(value: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(value, hash);
+  }
 }
