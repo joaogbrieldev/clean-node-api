@@ -27,7 +27,10 @@ export class DBAuthentication implements Authentication {
       );
       if (isValid) {
         const accessToken = await this.hasher.hash(account.id);
-        await this.updateAccessTokenRepository.update(account.id, accessToken);
+        await this.updateAccessTokenRepository.updateAccessToken(
+          account.id,
+          accessToken
+        );
         return accessToken;
       }
     }

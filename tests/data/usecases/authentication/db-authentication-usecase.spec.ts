@@ -24,7 +24,7 @@ describe("DBAuthenticationUsecase", () => {
   }
 
   class UpdateAccessTokenRepositorySpy implements UpdateAccessTokenRepository {
-    async update(id: string, token: string): Promise<void> {
+    async updateAccessToken(id: string, token: string): Promise<void> {
       return new Promise((resolve) => resolve());
     }
   }
@@ -150,7 +150,7 @@ describe("DBAuthenticationUsecase", () => {
     const { sut, updateAccessTokenRepository } = makeSut();
     const updateAccessTokenRepositorySpy = jest.spyOn(
       updateAccessTokenRepository,
-      "update"
+      "updateAccessToken"
     );
     await sut.auth(makeFakeAuthentication());
     expect(updateAccessTokenRepositorySpy).toHaveBeenCalledWith(
@@ -161,7 +161,7 @@ describe("DBAuthenticationUsecase", () => {
   test("should throw if UpdateAccessTokenRepository throws", async () => {
     const { sut, updateAccessTokenRepository } = makeSut();
     jest
-      .spyOn(updateAccessTokenRepository, "update")
+      .spyOn(updateAccessTokenRepository, "updateAccessToken")
       .mockRejectedValueOnce(new Error());
     const promise = sut.auth(makeFakeAuthentication());
     await expect(promise).rejects.toThrow();
