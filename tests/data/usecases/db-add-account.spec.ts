@@ -27,6 +27,9 @@ const makeHasherStub = (): Hasher => {
     async hash(value: string): Promise<string> {
       return new Promise((resolve) => resolve("hashed_password"));
     }
+    async compare(value: string, hash: string): Promise<boolean> {
+      return new Promise((resolve) => resolve(true));
+    }
   }
   return new HasherStub();
 };
