@@ -53,5 +53,14 @@ describe("SignUp Routes", () => {
           expect(res.body.accessToken).toBeTruthy();
         });
     });
+    test("should return 401 on invalid credentials", async () => {
+      await request(app)
+        .post("/api/login")
+        .send({
+          email: "john.doe@example.com",
+          password: "123456",
+        })
+        .expect(401);
+    });
   });
 });
