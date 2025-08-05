@@ -1,9 +1,9 @@
-import { Hasher } from "@/data/protocols/criptography/hasher";
 import {
   Authentication,
   AuthenticationModel,
 } from "@/domain/usecases/authentication";
 import {
+  Encrypter,
   HashComparer,
   LoadAccountByEmailRepository,
   UpdateAccessTokenRepository,
@@ -13,7 +13,7 @@ export class DBAuthentication implements Authentication {
   constructor(
     private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
     private readonly hashComparer: HashComparer,
-    private readonly hasher: Hasher,
+    private readonly encrypter: Encrypter,
     private readonly updateAccessTokenRepository: UpdateAccessTokenRepository
   ) {}
   async auth(authentication: AuthenticationModel): Promise<string> {
@@ -26,7 +26,7 @@ export class DBAuthentication implements Authentication {
         account.password
       );
       if (isValid) {
-        const accessToken = await this.hasher.hash(account.id);
+        const accessToken = await this.encrypter.encrypt(account.id);
         await this.updateAccessTokenRepository.updateAccessToken(
           account.id,
           accessToken

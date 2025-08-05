@@ -8,6 +8,7 @@ const makeSut = (): LogMongoRepository => {
 
 describe("LogRepository", () => {
   let errorCollection: Collection;
+
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL);
   });
@@ -19,6 +20,13 @@ describe("LogRepository", () => {
   beforeEach(async () => {
     errorCollection = await MongoHelper.getCollection("errors");
     await errorCollection.deleteMany({});
+  });
+
+  afterEach(async () => {
+    // Ensure any pending operations are completed
+    if (errorCollection) {
+      await errorCollection.deleteMany({});
+    }
   });
 
   test("should create an error log on success", async () => {
@@ -33,6 +41,8 @@ describe("LogRepository", () => {
 
     const count = await errorCollection.countDocuments();
     expect(count).toBe(1);
-    expect(errorCollection.findOne({ message: log.message })).toBeTruthy();
+
+    const logEntry = await errorCollection.findOne({ stack: log.message });
+    expect(logEntry).toBeTruthy();
   });
 });

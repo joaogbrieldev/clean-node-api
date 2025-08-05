@@ -5,11 +5,20 @@ export const MongoHelper = {
   uri: null as string,
   async connect(uri: string): Promise<void> {
     this.uri = uri;
-    this.client = await MongoClient.connect(uri);
+    this.client = await MongoClient.connect(uri, {
+      // Reduce session timeout and improve cleanup
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      maxIdleTimeMS: 30000,
+    });
   },
   async disconnect(): Promise<void> {
-    await this.client.close();
-    this.client = null;
+    if (this.client) {
+      // Close all active sessions before disconnecting
+      await this.client.close(true);
+      this.client = null;
+    }
   },
   async getCollection(name: string): Promise<Collection> {
     if (!this.client) {
