@@ -1,6 +1,6 @@
-import { Hasher } from "@/data/protocols/criptography/hasher";
 import { DBAuthentication } from "@/data/usecases/authentication/db-authentication";
 import {
+  Encrypter,
   HashComparer,
   LoadAccountByEmailRepository,
   UpdateAccessTokenRepository,
@@ -13,7 +13,7 @@ describe("DBAuthenticationUsecase", () => {
     sut: DBAuthentication;
     hashComparer: HashComparerStub;
     loadAccountByEmailRepository: LoadAccountByEmailRepositorySpy;
-    hasher: HasherStub;
+    encrypter: HasherStub;
     updateAccessTokenRepository: UpdateAccessTokenRepositorySpy;
   };
 
@@ -29,8 +29,8 @@ describe("DBAuthenticationUsecase", () => {
     }
   }
 
-  class HasherStub implements Hasher {
-    async hash(value: string): Promise<string> {
+  class HasherStub implements Encrypter {
+    async encrypt(value: string): Promise<string> {
       return new Promise((resolve) => resolve("any_token"));
     }
     async compare(value: string, hash: string): Promise<boolean> {
@@ -58,19 +58,19 @@ describe("DBAuthenticationUsecase", () => {
   const makeSut = (): SutTypes => {
     const hashComparer = new HashComparerStub();
     const loadAccountByEmailRepository = new LoadAccountByEmailRepositorySpy();
-    const hasher = new HasherStub();
+    const encrypter = new HasherStub();
     const updateAccessTokenRepository = new UpdateAccessTokenRepositorySpy();
     const sut = new DBAuthentication(
       loadAccountByEmailRepository,
       hashComparer,
-      hasher,
+      encrypter,
       updateAccessTokenRepository
     );
     return {
       sut,
       loadAccountByEmailRepository,
       hashComparer,
-      hasher,
+      encrypter,
       updateAccessTokenRepository,
     };
   };
@@ -129,22 +129,22 @@ describe("DBAuthenticationUsecase", () => {
     expect(authentication).toBeNull();
   });
   test("should call Hasher with correct value", async () => {
-    const { sut, hasher } = makeSut();
-    const hasherSpy = jest.spyOn(hasher, "hash");
+    const { sut, encrypter } = makeSut();
+    const encrypterSpy = jest.spyOn(encrypter, "encrypt");
     await sut.auth(makeFakeAuthentication());
-    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(encrypterSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should return the accessToken on success", async () => {
-    const { sut, hasher } = makeSut();
-    const hasherSpy = jest.spyOn(hasher, "hash");
+    const { sut, encrypter } = makeSut();
+    const encrypterSpy = jest.spyOn(encrypter, "encrypt");
     await sut.auth(makeFakeAuthentication());
-    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(encrypterSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should return the accessToken on success", async () => {
-    const { sut, hasher } = makeSut();
-    const hasherSpy = jest.spyOn(hasher, "hash");
+    const { sut, encrypter } = makeSut();
+    const encrypterSpy = jest.spyOn(encrypter, "encrypt");
     await sut.auth(makeFakeAuthentication());
-    expect(hasherSpy).toHaveBeenCalledWith(makeFakeAccount().id);
+    expect(encrypterSpy).toHaveBeenCalledWith(makeFakeAccount().id);
   });
   test("should call UpdateAccessTokenRepository with correct values", async () => {
     const { sut, updateAccessTokenRepository } = makeSut();
