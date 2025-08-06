@@ -9,10 +9,10 @@ services:
     volumes:
       - ./data/db:/data/db
   api:
-    container_name: api
-    build: .
-    image: clean-node-api
-    command: npm start
+    container_name: api-container
+    image: node:12
+    working_dir: /usr/src/clean-node-api
+    command: bash -c "npm install --only=prod && npm run start"
     restart: always
     ports:
       - 5050:5050
@@ -20,3 +20,4 @@ services:
       - mongo
     volumes:
       - ./dist:/usr/src/clean-node-api/dist
+      - ./package.json:/usr/src/clean-node-api/package.json
