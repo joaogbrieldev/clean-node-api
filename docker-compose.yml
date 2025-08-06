@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:3.6
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/db:/data/db
+  api:
+    container_name: api-container
+    image: node:12
+    working_dir: /usr/src/clean-node-api
+    command: bash -c "npm install --only=prod && npm run start"
+    restart: always
+    ports:
+      - 5050:5050
+    links:
+      - mongo
+    volumes:
+      - ./dist/:/usr/src/clean-node-api/dist/
+      - ./package.json:/usr/src/clean-node-api/package.json
