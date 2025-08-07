@@ -8,9 +8,14 @@ import {
   HttpRequest,
   Validation,
 } from "@/presentation/controllers/signup/signup-protocols";
-import { MissingParamError, ServerError } from "@/presentation/errors";
+import {
+  EmailInUseError,
+  MissingParamError,
+  ServerError,
+} from "@/presentation/errors";
 import {
   badRequest,
+  forbidden,
   ok,
   serverError,
 } from "@/presentation/helpers/http/http-helper";
@@ -162,5 +167,12 @@ describe("SignUpController", () => {
     const httpRequest = makeFakeRequest();
     const httpResponse = await sut.handle(httpRequest);
     expect(httpResponse).toEqual(serverError(new ServerError("any_error")));
+  });
+  test("Should return 403 if addAccount returns null", async () => {
+    const { sut, addAccountStub } = makeSut();
+    jest.spyOn(addAccountStub, "add").mockReturnValueOnce(null);
+    const httpRequest = makeFakeRequest();
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(forbidden(new EmailInUseError()));
   });
 });
