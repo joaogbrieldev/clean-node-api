@@ -1,21 +1,15 @@
-import { DbAddAccount } from "@/data/usecases/add-account/db-add-account";
-import { BcryptAdapter } from "@/infra/criptography/bcrypt-adapter/bcrypt-adapter";
-import { AccountMongoRepository } from "@/infra/db/mongodb/account-repository/account";
-import { LogMongoRepository } from "@/infra/db/mongodb/log-repository/log";
-import { LogControllerDecorator } from "@/main/decorators/log";
 import { SignUpController } from "@/presentation/controllers/signup/signup-controller";
 import { Controller } from "@/presentation/protocols";
+import { makeDbAddAccount } from "./login/db-add-account-factory";
+import { makeDbAuthentication } from "./login/db-authentication-factory";
+import { makeLogControllerDecorator } from "./login/log-controller-decorator.factory";
 import { makeSignUpValidation } from "./signup-validation";
 
 export const makeSignUpController = (): Controller => {
-  const salt = 12;
-  const bcryptAdapter = new BcryptAdapter(salt);
-  const accountMongoRepository = new AccountMongoRepository();
-  const dbAddAccount = new DbAddAccount(bcryptAdapter, accountMongoRepository);
   const signUpController = new SignUpController(
-    dbAddAccount,
-    makeSignUpValidation()
+    makeDbAddAccount(),
+    makeSignUpValidation(),
+    makeDbAuthentication()
   );
-  const logMongoRepository = new LogMongoRepository();
-  return new LogControllerDecorator(signUpController, logMongoRepository);
+  return makeLogControllerDecorator(signUpController);
 };
