@@ -11,7 +11,7 @@ import {
   serverError,
   unauthorized,
 } from "@/presentation/helpers/http/http-helper";
-import { Validation } from "@/presentation/protocols/validation";
+import { Validation } from "@/validation/protocols/validation";
 
 const makeFakeRequest = (): HttpRequest => {
   return {
