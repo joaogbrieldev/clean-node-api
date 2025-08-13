@@ -1,6 +1,6 @@
 {
   "name": "clean-node-api",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "NodeJs Rest API and GraphQL using TDD, Clean Architecture, Typescript and Design Patterns",
   "author": "João Gabriel",
   "license": "GPL-3.0-or-later",
