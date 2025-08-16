@@ -4,7 +4,10 @@ import {
   AddSurveyModel,
   HttpRequest,
 } from "@/presentation/controllers/survey/add-survey/add-survey-controller-protocols";
-import { badRequest } from "@/presentation/helpers/http/http-helper";
+import {
+  badRequest,
+  serverError,
+} from "@/presentation/helpers/http/http-helper";
 import { Validation } from "@/validation/protocols/validation";
 
 interface SutTypes {
@@ -72,5 +75,12 @@ describe("AddSurvey Controller", () => {
     const addSurveySpy = jest.spyOn(addSurveyStub, "add");
     await sut.handle(httpRequest);
     expect(addSurveySpy).toHaveBeenCalledWith(httpRequest.body);
+  });
+  test("should return 500 if AddSurvey throws", async () => {
+    const { sut, addSurveyStub } = makeSut();
+    jest.spyOn(addSurveyStub, "add").mockRejectedValueOnce(new Error());
+    const httpRequest = makeFakeRequest();
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(serverError(new Error()));
   });
 });
