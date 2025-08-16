@@ -5,7 +5,10 @@ import {
   HttpRequest,
   HttpResponse,
 } from "@/presentation/controllers/survey/add-survey/add-survey-controller-protocols";
-import { badRequest } from "@/presentation/helpers/http/http-helper";
+import {
+  badRequest,
+  serverError,
+} from "@/presentation/helpers/http/http-helper";
 import { Validation } from "@/validation/protocols/validation";
 
 export class AddSurveyController implements Controller {
@@ -14,16 +17,20 @@ export class AddSurveyController implements Controller {
     private readonly addSurvey: AddSurvey
   ) {}
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-    const error = this.validation.validate(httpRequest.body);
-    if (error) {
-      return badRequest(error);
+    try {
+      const error = this.validation.validate(httpRequest.body);
+      if (error) {
+        return badRequest(error);
+      }
+      const { question, answers } = httpRequest.body;
+      const surveyData: AddSurveyModel = {
+        question,
+        answers,
+      };
+      await this.addSurvey.add(surveyData);
+      return null;
+    } catch (error) {
+      return serverError(error);
     }
-    const { question, answers } = httpRequest.body;
-    const surveyData: AddSurveyModel = {
-      question,
-      answers,
-    };
-    await this.addSurvey.add(surveyData);
-    return null;
   }
 }
