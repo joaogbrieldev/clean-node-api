@@ -1,5 +1,5 @@
 import { AccountModel } from "@/domain/models/account";
-import { SignUpController } from "@/presentation/controllers/signup/signup-controller";
+import { SignUpController } from "@/presentation/controllers/login/signup/signup-controller";
 import {
   AddAccount,
   AddAccountModel,
@@ -7,7 +7,7 @@ import {
   AuthenticationModel,
   HttpRequest,
   Validation,
-} from "@/presentation/controllers/signup/signup-protocols";
+} from "@/presentation/controllers/login/signup/signup-protocols";
 import {
   EmailInUseError,
   MissingParamError,
