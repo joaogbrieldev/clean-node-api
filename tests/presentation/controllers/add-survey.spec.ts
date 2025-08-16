@@ -35,11 +35,11 @@ const makeFakeRequest = (): HttpRequest => {
 };
 
 describe("AddSurvey Controller", () => {
-  test("Should call Validation with correct values", () => {
+  test("Should call Validation with correct value", async () => {
     const { sut, validationStub } = makeSut();
     const httpRequest = makeFakeRequest();
     const validateSpy = jest.spyOn(validationStub, "validate");
-    sut.handle(httpRequest);
+    await sut.handle(httpRequest);
     expect(validateSpy).toHaveBeenCalledWith(httpRequest.body);
   });
 });
