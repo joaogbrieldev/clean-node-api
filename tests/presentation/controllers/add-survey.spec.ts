@@ -6,6 +6,7 @@ import {
 } from "@/presentation/controllers/survey/add-survey/add-survey-controller-protocols";
 import {
   badRequest,
+  noContent,
   serverError,
 } from "@/presentation/helpers/http/http-helper";
 import { Validation } from "@/validation/protocols/validation";
@@ -82,5 +83,11 @@ describe("AddSurvey Controller", () => {
     const httpRequest = makeFakeRequest();
     const httpResponse = await sut.handle(httpRequest);
     expect(httpResponse).toEqual(serverError(new Error()));
+  });
+  test("should return 204 on success", async () => {
+    const { sut } = makeSut();
+    const httpRequest = makeFakeRequest();
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(noContent());
   });
 });
