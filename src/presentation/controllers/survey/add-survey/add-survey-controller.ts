@@ -7,6 +7,7 @@ import {
 } from "@/presentation/controllers/survey/add-survey/add-survey-controller-protocols";
 import {
   badRequest,
+  noContent,
   serverError,
 } from "@/presentation/helpers/http/http-helper";
 import { Validation } from "@/validation/protocols/validation";
@@ -28,7 +29,7 @@ export class AddSurveyController implements Controller {
         answers,
       };
       await this.addSurvey.add(surveyData);
-      return null;
+      return noContent();
     } catch (error) {
       return serverError(error);
     }
