@@ -4,6 +4,10 @@ import { AddSurvey, AddSurveyModel } from "@/domain/usecases/add-survey";
 export class DbAddSurvey implements AddSurvey {
   constructor(private readonly addSurveyRepository: AddSurveyRepository) {}
   async add(surveyData: AddSurveyModel): Promise<void> {
-    await this.addSurveyRepository.add(surveyData);
+    try {
+      await this.addSurveyRepository.add(surveyData);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
