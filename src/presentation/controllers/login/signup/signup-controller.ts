@@ -4,7 +4,7 @@ import {
   forbidden,
   ok,
   serverError,
-} from "../../helpers/http/http-helper";
+} from "../../../helpers/http/http-helper";
 import {
   AddAccount,
   Authentication,

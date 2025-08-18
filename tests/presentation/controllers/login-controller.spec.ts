@@ -1,9 +1,9 @@
-import { LoginController } from "@/presentation/controllers/login/login-controller";
+import { LoginController } from "@/presentation/controllers/login/login/login-controller";
 import {
   Authentication,
   AuthenticationModel,
   HttpRequest,
-} from "@/presentation/controllers/login/login-protocols";
+} from "@/presentation/controllers/login/login/login-protocols";
 import { MissingParamError } from "@/presentation/errors/missing-param-error";
 import {
   badRequest,
