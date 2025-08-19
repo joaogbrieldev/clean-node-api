@@ -1,13 +1,13 @@
 import { AccountModel } from "@/domain/models/account";
-import { LoadAccountByToken } from "@/domain/usecases/load-account-by-token";
-import { AcessDeniedError } from "@/presentation/errors";
+import { AuthMiddleware } from "@/presentation/middlewares/auth-middleware";
 import {
+  AcessDeniedError,
   forbidden,
+  HttpRequest,
+  LoadAccountByToken,
   ok,
   serverError,
-} from "@/presentation/helpers/http/http-helper";
-import { AuthMiddleware } from "@/presentation/middlewares/auth-middleware";
-import { HttpRequest } from "@/presentation/protocols";
+} from "@/presentation/middlewares/auth-middleware-protocols";
 
 interface SutTypes {
   sut: AuthMiddleware;
