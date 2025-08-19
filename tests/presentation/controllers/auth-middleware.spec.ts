@@ -1,7 +1,11 @@
 import { AccountModel } from "@/domain/models/account";
 import { LoadAccountByToken } from "@/domain/usecases/load-account-by-token";
 import { AcessDeniedError } from "@/presentation/errors";
-import { forbidden, ok } from "@/presentation/helpers/http/http-helper";
+import {
+  forbidden,
+  ok,
+  serverError,
+} from "@/presentation/helpers/http/http-helper";
 import { AuthMiddleware } from "@/presentation/middlewares/auth-middleware";
 import { HttpRequest } from "@/presentation/protocols";
 
@@ -69,5 +73,14 @@ describe("AuthMiddleware", () => {
     const httpRequest: HttpRequest = makeFakeRequest();
     const httpResponse = await sut.handle(httpRequest);
     expect(httpResponse).toEqual(ok({ accountId: "any_id" }));
+  });
+  test("should return 500 if LoadAccountByToken throws", async () => {
+    const { sut, loadAccountByTokenStub } = makeSut();
+    jest
+      .spyOn(loadAccountByTokenStub, "load")
+      .mockRejectedValueOnce(new Error());
+    const httpRequest: HttpRequest = makeFakeRequest();
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(serverError(new Error()));
   });
 });
