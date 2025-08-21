@@ -5,7 +5,9 @@ export class DbLoadAccountByToken {
   constructor(private readonly decrypter: Decrypter) {}
 
   async load(accessToken: string): Promise<AccountModel> {
-    await this.decrypter.decrypt(accessToken);
-    return null;
+    const token = await this.decrypter.decrypt(accessToken);
+    if (!token) {
+      return null;
+    }
   }
 }
