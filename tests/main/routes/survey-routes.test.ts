@@ -20,28 +20,14 @@ describe("Survey Routes", () => {
   });
 
   describe("POST /surveys", () => {
-    test("should return 200 on success", async () => {
-      await surveyCollection.insertOne({
-        question: "any_question",
-        answers: [
-          {
-            answer: "any_answer",
-            image: "any_image",
-          },
-        ],
-      });
+    test("should return 403 if no x-access-token is provided", async () => {
       await request(app)
         .post("/api/surveys")
         .send({
           question: "any_question",
-          answers: [
-            {
-              answer: "any_answer",
-              image: "any_image",
-            },
-          ],
+          answers: [{ answer: "any_answer" }],
         })
-        .expect(204);
+        .expect(403);
     });
   });
 });
