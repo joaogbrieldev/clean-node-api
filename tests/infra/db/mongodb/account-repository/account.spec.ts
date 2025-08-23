@@ -92,8 +92,9 @@ describe("Account Mongo Repository", () => {
           name: "any_name",
           password: "any_password",
           accessToken: "any_token",
+          role: "admin",
         });
-        const account = await sut.loadByToken("any_token");
+        const account = await sut.loadByToken("any_token", "admin");
         expect(account).toBeTruthy();
         expect(account.id).toBeTruthy();
         expect(account.name).toBe("any_name");
