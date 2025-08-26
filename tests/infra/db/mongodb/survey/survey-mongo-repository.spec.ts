@@ -31,6 +31,7 @@ describe("Account Mongo Repository", () => {
           image: "any_image",
         },
       ],
+      date: new Date(),
     });
     const surveyInDb = await surveyCollection.findOne({
       question: "any_question",

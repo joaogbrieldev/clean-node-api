@@ -27,6 +27,7 @@ export class AddSurveyController implements Controller {
       const surveyData: AddSurveyModel = {
         question,
         answers,
+        date: new Date(),
       };
       await this.addSurvey.add(surveyData);
       return noContent();
