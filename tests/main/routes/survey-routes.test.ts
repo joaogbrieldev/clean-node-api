@@ -60,5 +60,22 @@ describe("Survey Routes", () => {
     test("should return 403 if no x-access-token is provided", async () => {
       await request(app).get("/api/surveys").expect(403);
     });
+    test("should return 200 on load surveys with valid acessToken", async () => {
+      const res = await accountCollection.insertOne({
+        email: "any_email@mail.com",
+        name: "any_name",
+        password: "any_password",
+      });
+      const id = res.insertedId.toString();
+      const accessToken = jwt.sign({ id }, env.jwtSecret);
+      await accountCollection.updateOne(
+        { _id: res.insertedId },
+        { $set: { accessToken } }
+      );
+      await request(app)
+        .get("/api/surveys")
+        .set("x-access-token", accessToken)
+        .expect(204);
+    });
   });
 });
