@@ -56,4 +56,9 @@ describe("Survey Routes", () => {
         .expect(204);
     });
   });
+  describe("GET /surveys", () => {
+    test("should return 403 if no x-access-token is provided", async () => {
+      await request(app).get("/api/surveys").expect(403);
+    });
+  });
 });
