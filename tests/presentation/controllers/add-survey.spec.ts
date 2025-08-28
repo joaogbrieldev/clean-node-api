@@ -10,6 +10,7 @@ import {
   serverError,
 } from "@/presentation/helpers/http/http-helper";
 import { Validation } from "@/validation/protocols/validation";
+import MockDate from "mockdate";
 
 interface SutTypes {
   sut: AddSurveyController;
@@ -51,11 +52,18 @@ const makeFakeRequest = (): HttpRequest => {
     body: {
       question: "any_question",
       answers: [{ image: "any_image" }, { answer: "any_answer" }],
+      date: new Date(),
     },
   };
 };
 
 describe("AddSurvey Controller", () => {
+  beforeAll(() => {
+    MockDate.set(new Date());
+  });
+  afterAll(() => {
+    MockDate.reset();
+  });
   test("Should call Validation with correct value", async () => {
     const { sut, validationStub } = makeSut();
     const httpRequest = makeFakeRequest();
