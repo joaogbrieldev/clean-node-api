@@ -14,6 +14,8 @@ services:
     working_dir: /usr/src/clean-node-api
     command: bash -c "npm install --only=prod && npm run start"
     restart: always
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/clean-node-api
     ports:
       - 5050:5050
     links:
