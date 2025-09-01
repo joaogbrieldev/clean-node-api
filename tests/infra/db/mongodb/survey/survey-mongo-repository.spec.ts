@@ -73,4 +73,18 @@ describe("Account Mongo Repository", () => {
       expect(surveys).toEqual([]);
     });
   });
+  describe("LoadById", () => {
+    test("Should return a survey on success", async () => {
+      const sut = makeSut();
+      const survey = await surveyCollection.insertOne({
+        question: "any_question",
+        answers: [{ answer: "any_answer" }],
+        date: new Date(),
+      });
+      const surveyInDb = await sut.loadById(survey.insertedId.toString());
+      expect(surveyInDb).toBeTruthy();
+      expect(surveyInDb.question).toBe("any_question");
+      expect(surveyInDb.answers).toEqual([{ answer: "any_answer" }]);
+    });
+  });
 });
