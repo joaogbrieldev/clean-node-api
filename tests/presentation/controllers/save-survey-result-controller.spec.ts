@@ -9,6 +9,7 @@ import { SaveSurveyResultController } from "@/presentation/controllers/survey-re
 import { AcessDeniedError, InvalidParamError } from "@/presentation/errors";
 import {
   forbidden,
+  ok,
   serverError,
 } from "@/presentation/helpers/http/http-helper";
 import { HttpRequest } from "@/presentation/protocols";
@@ -142,5 +143,10 @@ describe("Save Survey Result Controller", () => {
     jest.spyOn(saveSurveyResultStub, "save").mockRejectedValueOnce(new Error());
     const httpResponse = await sut.handle(makeFakeRequest());
     expect(httpResponse).toEqual(serverError(new Error()));
+  });
+  test("should return 200 on success", async () => {
+    const { sut } = makeSut();
+    const httpResponse = await sut.handle(makeFakeRequest());
+    expect(httpResponse).toEqual(ok(makeFakeSurveyResult()));
   });
 });
