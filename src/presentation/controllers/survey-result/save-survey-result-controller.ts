@@ -1,5 +1,5 @@
 import { LoadSurveyById } from "@/domain/usecases/load-survey-by-id";
-import { AcessDeniedError } from "@/presentation/errors";
+import { AcessDeniedError, InvalidParamError } from "@/presentation/errors";
 import {
   forbidden,
   serverError,
@@ -17,9 +17,15 @@ export class SaveSurveyResultController implements Controller {
       const survey = await this.loadSurveyById.loadById(
         httpRequest.params.surveyId
       );
-      if (!survey) {
+      if (survey) {
+        const answers = survey.answers.map((answer) => answer.answer);
+        if (!answers.includes(httpRequest.body.answer)) {
+          return forbidden(new InvalidParamError("answer"));
+        }
+      } else {
         return forbidden(new AcessDeniedError());
       }
+
       return null;
     } catch (error) {
       return serverError(error);
