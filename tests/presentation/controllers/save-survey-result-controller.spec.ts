@@ -1,7 +1,7 @@
 import { SurveyModel } from "@/domain/models/survey";
 import { LoadSurveyById } from "@/domain/usecases/load-survey-by-id";
 import { SaveSurveyResultController } from "@/presentation/controllers/survey-result/save-survey-result-controller";
-import { AcessDeniedError } from "@/presentation/errors";
+import { AcessDeniedError, InvalidParamError } from "@/presentation/errors";
 import {
   forbidden,
   serverError,
@@ -12,6 +12,9 @@ const makeFakeRequest = (): HttpRequest => {
   return {
     params: {
       surveyId: "any_survey_id",
+    },
+    body: {
+      answer: "any_answer",
     },
   };
 };
@@ -68,5 +71,17 @@ describe("Save Survey Result Controller", () => {
       .mockRejectedValueOnce(new Error());
     const httpResponse = await sut.handle(makeFakeRequest());
     expect(httpResponse).toEqual(serverError(new Error()));
+  });
+  test("should return 403 if an invalid answer is provided", async () => {
+    const { sut } = makeSut();
+    const httpResponse = await sut.handle({
+      params: {
+        surveyId: "any_survey_id",
+      },
+      body: {
+        answer: "invalid_answer",
+      },
+    });
+    expect(httpResponse).toEqual(forbidden(new InvalidParamError("answer")));
   });
 });
