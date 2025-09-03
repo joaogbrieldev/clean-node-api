@@ -2,7 +2,10 @@ import { SurveyModel } from "@/domain/models/survey";
 import { LoadSurveyById } from "@/domain/usecases/load-survey-by-id";
 import { SaveSurveyResultController } from "@/presentation/controllers/survey-result/save-survey-result-controller";
 import { AcessDeniedError } from "@/presentation/errors";
-import { forbidden } from "@/presentation/helpers/http/http-helper";
+import {
+  forbidden,
+  serverError,
+} from "@/presentation/helpers/http/http-helper";
 import { HttpRequest } from "@/presentation/protocols";
 
 const makeFakeRequest = (): HttpRequest => {
@@ -57,5 +60,13 @@ describe("Save Survey Result Controller", () => {
     jest.spyOn(loadSurveyByIdStub, "loadById").mockResolvedValueOnce(null);
     const httpResponse = await sut.handle(makeFakeRequest());
     expect(httpResponse).toEqual(forbidden(new AcessDeniedError()));
+  });
+  test("should return 500 if LoadSurveyById throws", async () => {
+    const { sut, loadSurveyByIdStub } = makeSut();
+    jest
+      .spyOn(loadSurveyByIdStub, "loadById")
+      .mockRejectedValueOnce(new Error());
+    const httpResponse = await sut.handle(makeFakeRequest());
+    expect(httpResponse).toEqual(serverError(new Error()));
   });
 });
