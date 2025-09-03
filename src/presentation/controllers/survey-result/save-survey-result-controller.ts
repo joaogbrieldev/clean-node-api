@@ -1,4 +1,5 @@
 import { LoadSurveyById } from "@/domain/usecases/load-survey-by-id";
+import { SaveSurveyResult } from "@/domain/usecases/save-survey-result";
 import { AcessDeniedError, InvalidParamError } from "@/presentation/errors";
 import {
   forbidden,
@@ -11,7 +12,10 @@ import {
 } from "@/presentation/protocols";
 
 export class SaveSurveyResultController implements Controller {
-  constructor(private readonly loadSurveyById: LoadSurveyById) {}
+  constructor(
+    private readonly loadSurveyById: LoadSurveyById,
+    private readonly saveSurveyResult: SaveSurveyResult
+  ) {}
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const survey = await this.loadSurveyById.loadById(
@@ -26,6 +30,12 @@ export class SaveSurveyResultController implements Controller {
         return forbidden(new AcessDeniedError());
       }
 
+      await this.saveSurveyResult.save({
+        surveyId: httpRequest.params.surveyId,
+        accountId: httpRequest.accountId,
+        answer: httpRequest.body.answer,
+        date: new Date(),
+      });
       return null;
     } catch (error) {
       return serverError(error);
