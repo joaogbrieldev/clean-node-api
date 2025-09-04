@@ -1,76 +1,99 @@
-import { MongoHelper } from "@/infra/db/mongodb/helpers/mongo-helper";
-import app from "@/main/config/app";
-import env from "@/main/config/env";
-import jwt from "jsonwebtoken";
-import { Collection } from "mongodb";
-import request from "supertest";
-let surveyCollection: Collection;
-let accountCollection: Collection;
+import env from '@/main/config/env'
+import { MongoHelper } from '@/infra/db'
+import { setupApp } from '@/main/config/app'
 
-const makeAccessToken = async (): Promise<string> => {
+import { sign } from 'jsonwebtoken'
+import { Collection } from 'mongodb'
+import { Express } from 'express'
+import request from 'supertest'
+
+let surveyCollection: Collection
+let accountCollection: Collection
+let app: Express
+
+const mockAccessToken = async (): Promise<string> => {
   const res = await accountCollection.insertOne({
-    email: "any_email@mail.com",
-    name: "any_name",
-    password: "any_password",
-    role: "admin",
-  });
-  const id = res.insertedId.toString();
-  const accessToken = jwt.sign({ id }, env.jwtSecret);
-  await accountCollection.updateOne(
-    { _id: res.insertedId },
-    { $set: { accessToken } }
-  );
-  return accessToken;
-};
+    name: 'Rodrigo',
+    email: 'rodrigo.manguinho@gmail.com',
+    password: '123',
+    role: 'admin'
+  })
+  const id = res.insertedId.toHexString()
+  const accessToken = sign({ id }, env.jwtSecret)
+  await accountCollection.updateOne({
+    _id: res.insertedId
+  }, {
+    $set: {
+      accessToken
+    }
+  })
+  return accessToken
+}
 
-describe("Survey Routes", () => {
+describe('Survey Routes', () => {
   beforeAll(async () => {
-    await MongoHelper.connect(process.env.MONGO_URL);
-  });
+    app = await setupApp()
+    await MongoHelper.connect(process.env.MONGO_URL)
+  })
 
   afterAll(async () => {
-    await MongoHelper.disconnect();
-  });
+    await MongoHelper.disconnect()
+  })
 
   beforeEach(async () => {
-    surveyCollection = await MongoHelper.getCollection("surveys");
-    accountCollection = await MongoHelper.getCollection("accounts");
-    await surveyCollection.deleteMany({});
-    await accountCollection.deleteMany({});
-  });
+    surveyCollection = MongoHelper.getCollection('surveys')
+    await surveyCollection.deleteMany({})
+    accountCollection = MongoHelper.getCollection('accounts')
+    await accountCollection.deleteMany({})
+  })
 
-  describe("POST /surveys", () => {
-    test("should return 403 if no x-access-token is provided", async () => {
+  describe('POST /surveys', () => {
+    test('Should return 403 on add survey without accessToken', async () => {
       await request(app)
-        .post("/api/surveys")
+        .post('/api/surveys')
         .send({
-          question: "any_question",
-          answers: [{ answer: "any_answer" }],
+          question: 'Question',
+          answers: [{
+            answer: 'Answer 1',
+            image: 'http://image-name.com'
+          }, {
+            answer: 'Answer 2'
+          }]
         })
-        .expect(403);
-    });
-    test("should return 204 on add survey with valid acessToken", async () => {
-      const accessToken = await makeAccessToken();
+        .expect(403)
+    })
+
+    test('Should return 204 on add survey with valid accessToken', async () => {
+      const accessToken = await mockAccessToken()
       await request(app)
-        .post("/api/surveys")
-        .set("x-access-token", accessToken)
+        .post('/api/surveys')
+        .set('x-access-token', accessToken)
         .send({
-          question: "any_question",
-          answers: [{ answer: "any_answer" }],
+          question: 'Question',
+          answers: [{
+            answer: 'Answer 1',
+            image: 'http://image-name.com'
+          }, {
+            answer: 'Answer 2'
+          }]
         })
-        .expect(204);
-    });
-  });
-  describe("GET /surveys", () => {
-    test("should return 403 if no x-access-token is provided", async () => {
-      await request(app).get("/api/surveys").expect(403);
-    });
-    test("should return 200 on load surveys with valid acessToken", async () => {
-      const accessToken = await makeAccessToken();
+        .expect(204)
+    })
+  })
+
+  describe('GET /surveys', () => {
+    test('Should return 403 on load surveys without accessToken', async () => {
       await request(app)
-        .get("/api/surveys")
-        .set("x-access-token", accessToken)
-        .expect(204);
-    });
-  });
-});
+        .get('/api/surveys')
+        .expect(403)
+    })
+
+    test('Should return 204 on load surveys with valid accessToken', async () => {
+      const accessToken = await mockAccessToken()
+      await request(app)
+        .get('/api/surveys')
+        .set('x-access-token', accessToken)
+        .expect(204)
+    })
+  })
+})

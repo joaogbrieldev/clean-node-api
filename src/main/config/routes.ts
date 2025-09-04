@@ -1,10 +1,13 @@
-import loginRoutes from "@/main/routes/login-routes";
-import surveyRoutes from "@/main/routes/survey-routes";
-import { Express, Router } from "express";
+import { Express, Router } from 'express'
+import { readdirSync } from 'fs'
+import { join } from 'path'
 
 export default (app: Express): void => {
-  const router = Router();
-  app.use("/api", router);
-  loginRoutes(router);
-  surveyRoutes(router);
-};
+  const router = Router()
+  app.use('/api', router)
+  readdirSync(join(__dirname, '../routes')).map(async file => {
+    if (!file.endsWith('.map')) {
+      (await import(`../routes/${file}`)).default(router)
+    }
+  })
+}
